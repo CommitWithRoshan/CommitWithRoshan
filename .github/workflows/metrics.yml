@@ -1,0 +1,50 @@
+name: Terminal Metrics Telemetry Pipeline
+
+on:
+  schedule:
+    # Run pipeline every 6 hours automatically
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+jobs:
+  build-terminal-metrics:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Execute Lowlighter Metrics Engine
+        uses: lowlighter/metrics@latest
+        with:
+          token: ${{ secrets.METRICS_TOKEN }}
+          filename: github-metrics.svg
+          path: github-metrics.svg
+          
+          # Template Core Configuration
+          template: terminal
+          config_timezone: Asia/Kathmandu
+          
+          # Base Display Modules
+          base: header, activity, community, repositories, metadata
+          config_order: base.header, base.activity, languages, isocalendar, habits
+          
+          # Plugin: Language Usage Analysis
+          plugin_languages: yes
+          plugin_languages_ignored: html, css, tex, makefile
+          plugin_languages_details: percentage
+          plugin_languages_sections: most-used
+          plugin_languages_limit: 8
+          
+          # Plugin: Commit Activity Calendar
+          plugin_isocalendar: yes
+          plugin_isocalendar_duration: half-year
+          
+          # Plugin: Developer Habits Analysis
+          plugin_habits: yes
+          plugin_habits_from: 200
+          plugin_habits_days: 30
+          plugin_habits_facts: yes
+          plugin_habits_charts: yes
+          
+          # Plugin: High-Impact Contributions
+          plugin_notable: yes
+          plugin_notable_filter: stars:>10
